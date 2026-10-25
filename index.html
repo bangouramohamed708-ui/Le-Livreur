@@ -73,9 +73,9 @@ body{background:radial-gradient(ellipse at 14% 0%,rgba(208,232,213,.6),transpare
 .hero-intro h1{margin:0;color:var(--ink);font-size:clamp(2.1rem,7vw,3.15rem);font-weight:800;letter-spacing:-.055em;line-height:.99}
 .hero-intro h1 span{display:block;color:var(--brand)}
 .hero-intro p{max-width:46ch;margin:14px 0 0;color:var(--muted);font-size:1.03rem}
-fieldset{position:relative;margin:0 0 18px;padding:22px;border:0;border-radius:22px;background:var(--card);box-shadow:0 8px 26px rgba(28,55,36,.055)}
+fieldset{position:relative;margin:0 0 18px;padding:54px 22px 22px;border:0;border-radius:22px;background:var(--card);box-shadow:0 8px 26px rgba(28,55,36,.055)}
 fieldset::before{content:"";position:absolute;inset:0;border:1px solid var(--line);border-radius:inherit;pointer-events:none}
-legend{position:relative;z-index:1;width:auto;max-width:100%;margin:0 0 16px -8px;padding:0 8px;background:var(--card)}
+legend{position:absolute;z-index:1;top:17px;left:30px;width:auto;max-width:calc(100% - 52px);margin:0;padding:0;color:var(--ink);background:var(--card)}
 legend{display:block;width:100%;margin:0 0 16px;padding:0;color:var(--ink);font-size:1.18rem;letter-spacing:-.02em}
 .fld{margin-bottom:16px}
 input,select{min-height:52px;margin-top:7px;padding:12px 14px;border:1px solid var(--line);border-radius:13px;background:color-mix(in srgb,var(--card) 88%,var(--bg));transition:border-color .18s,box-shadow .18s,background .18s}
@@ -102,7 +102,7 @@ input:focus,select:focus{border-color:var(--brand);background:var(--card);box-sh
 .wave{border:1px solid color-mix(in srgb,var(--wave) 15%,var(--line));border-radius:18px}
 .ref{padding:5px 13px;border:1px solid var(--line)}
 .toast{padding-bottom:14px;box-shadow:0 8px 22px rgba(0,0,0,.12)}
-@media(max-width:560px){.wrap{padding:16px 14px 42px}.logo{width:min(100%,380px);margin-bottom:16px}.hero-intro{margin-bottom:22px}fieldset{padding:18px;border-radius:19px}.loc{padding:14px}.opt{min-height:92px;padding:13px}.sum div{gap:8px}.sum div span{max-width:70%}}
+@media(max-width:560px){.wrap{padding:16px 14px 42px}.logo{width:min(100%,380px);margin-bottom:16px}.hero-intro{margin-bottom:22px}fieldset{padding:48px 18px 18px;border-radius:19px}legend{left:26px}.loc{padding:14px}.opt{min-height:92px;padding:13px}.sum div{gap:8px}.sum div span{max-width:70%}}
 @media(prefers-reduced-motion:reduce){.btn,.opt,input,select{transition:none}}
 
 </style>
