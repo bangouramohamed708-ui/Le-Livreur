@@ -245,7 +245,7 @@ input:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(21,
   <footer class="site-footer"><div><strong>LeLivreur.Ci</strong><span>Le professionnel de la livraison urbaine à Abidjan.</span></div><a href="https://wa.me/2250779506009" target="_blank" rel="noopener">Assistance WhatsApp</a></footer>
 </main>
 
-<script src="backend-config.js"></script><script src="client-backend.js"></script><script>
+<script>(()=>{const p=new URLSearchParams(location.hash.slice(1));if(["invite","recovery"].includes(p.get("type"))&&p.get("access_token")){location.replace(new URL("admin.html"+location.hash,location.href).href)}})();</script><script src="backend-config.js"></script><script src="client-backend.js"></script><script>
 const WHATSAPP = "2250779506009";   // numéro WhatsApp qui reçoit les commandes (225 + 10 chiffres)
 const WAVE = "07 79 50 60 09";
 const LL_BACKEND = window.LELIVREUR_BACKEND || {};
