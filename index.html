@@ -153,7 +153,7 @@ input:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(21,
     <div class="header-actions"><span class="header-chip">Zone : Abidjan &amp; banlieue</span><a class="header-help" href="https://wa.me/2250779506009" target="_blank" rel="noopener">Assistance WhatsApp</a></div>
     </header>
   <section class="hero-intro" aria-labelledby="page-title">
-    <div class="hero-copy"><p class="hero-kicker">Livraison urbaine · Abidjan</p><h1 id="page-title">Demande d’expédition immédiate</h1><p>Zone couverte : Cocody, Plateau, Marcory, Treichville, Yopougon, Koumassi, Deux Plateaux, Riviera et périphérie.</p></div>
+    <div class="hero-copy"><p class="hero-kicker">Livraison urbaine · Abidjan</p><h1 id="page-title">Demande d’expédition immédiate</h1><p>Zone couverte : Cocody, Bingerville, Abobo Dokui, Abobo Sogefia et Plateau.</p></div>
     <div class="hero-facts"><span class="hero-fact">Colis : <strong>15 kg / 50 cm max.</strong></span><span class="hero-fact">À partir de <strong>1 000 FCFA</strong></span></div>
   </section>
 
@@ -198,8 +198,8 @@ input:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(21,
         <fieldset>
           <legend class="sr-only">Type de livraison</legend><div class="section-title compact">Type de livraison</div>
           <div class="opts">
-            <label class="opt"><input type="radio" name="mode" value="standard" checked><b>Standard</b><span class="price">1 000 FCFA</span><span>Livraison standard</span></label>
-            <label class="opt"><input type="radio" name="mode" value="express"><b>Express</b><span class="price">2 000 FCFA</span><span>Course prioritaire</span></label>
+            <label class="opt"><input type="radio" name="mode" value="standard" checked><b>Standard</b><span class="price" id="fee-standard">1 000 FCFA</span><span>Livraison standard</span></label>
+            <label class="opt"><input type="radio" name="mode" value="express"><b>Express</b><span class="price" id="fee-express">2 000 FCFA</span><span>Course prioritaire</span></label>
           </div>
         </fieldset>
         <div class="sum">
@@ -213,11 +213,11 @@ input:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(21,
     </aside>
   </form>
   <section class="coverage" aria-labelledby="coverage-title">
-    <div class="coverage-head"><div><p class="coverage-kicker">Livraison locale abidjanaise</p><h2 id="coverage-title">Zone de couverture à Abidjan</h2></div><span class="coverage-status">Zones desservies</span></div>
+    <div class="coverage-head"><div><p class="coverage-kicker">Livraison locale abidjanaise</p><h2 id="coverage-title">Zones couvertes et tarifs</h2></div><span class="coverage-status">5 zones desservies</span></div>
     <div class="zone-grid">
-      <article class="zone-card"><h3><span>1</span>Zone Nord &amp; Est</h3><p>Cocody, Deux Plateaux, Riviera, Bingerville.</p><p>Tarif : <b>1 000 FCFA</b> (Express : 2 000 FCFA).</p></article>
-      <article class="zone-card"><h3><span>2</span>Zone Centre &amp; Sud</h3><p>Plateau, Marcory, Zone 4, Treichville, Koumassi.</p><p>Tarif : <b>1 000 FCFA</b> (Express : 2 000 FCFA).</p></article>
-      <article class="zone-card"><h3><span>3</span>Zone Ouest &amp; Périphérie</h3><p>Yopougon, Attécoubé, Abobo et périphérie.</p><p>Tarif : <b>1 000 FCFA</b> (Express : 2 000 FCFA).</p></article>
+      <article class="zone-card"><h3><span>1</span>Zones desservies</h3><p>Cocody, Bingerville, Abobo Dokui, Abobo Sogefia et Plateau.</p><p>Les deux quartiers d’Abobo sont dans la même commune.</p></article>
+      <article class="zone-card"><h3><span>2</span>Dans une même commune</h3><p>Standard : <b>1 000 FCFA</b></p><p>Express : <b>2 000 FCFA</b></p></article>
+      <article class="zone-card"><h3><span>3</span>Entre deux communes</h3><p>Standard : <b>1 500 FCFA</b></p><p>Express : <b>2 500 FCFA</b></p></article>
     </div>
   </section>
 
@@ -249,8 +249,8 @@ input:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(21,
 const WHATSAPP = "2250779506009";   // numéro WhatsApp qui reçoit les commandes (225 + 10 chiffres)
 const WAVE = "07 79 50 60 09";
 const LL_BACKEND = window.LELIVREUR_BACKEND || {};
-const FRAIS = { standard: 1000, express: 2000 };
-const QUARTIERS = ["Plateau","Marcory","Zone 4","Treichville","Koumassi","Yopougon","Attécoubé","Abobo","Bingerville","Angré","Riviera Golf","Riviera Palmeraie","Riviera Bonoumin","Riviera Attoban","Riviera Faya","Deux Plateaux Vallons","Deux Plateaux Aghien","Deux Plateaux 7e tranche","Deux Plateaux 8e tranche","Cocody Danga","Blockhauss","Ambassades","Saint-Jean","Mermoz","Lycée Technique","Abatta","M’Pouto","Akouédo"];
+const TARIFS = { intra: { standard: 1000, express: 2000 }, inter: { standard: 1500, express: 2500 } };
+const QUARTIERS = ["Cocody","Bingerville","Abobo Dokui","Abobo Sogefia","Plateau"];
 const FF = '"Bricolage Grotesque","Segoe UI",system-ui,sans-serif';
 
 const $ = id => document.getElementById(id);
@@ -267,7 +267,9 @@ const restore = () => { try { const t = localStorage.getItem("ll-tel"); if (t) $
 restore();
 
 function toast(m) { const t = $("toast"); t.textContent = m; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("on"), 5000); }
-const sum = () => { $("sm-mode").textContent = mode(); $("sm-fee").textContent = fcfa(FRAIS[mode()]); };
+const commune = q => q.startsWith("Abobo ") ? "Abobo" : q;
+const frais = (m = mode()) => { const s = commune($("q-s")?.value || ""), r = commune($("q-r")?.value || ""); return s && r && s !== r ? TARIFS.inter[m] : TARIFS.intra[m]; };
+const sum = () => { const m = mode(); $("sm-mode").textContent = m; $("sm-fee").textContent = fcfa(frais(m)); $("fee-standard").textContent = fcfa(frais("standard")); $("fee-express").textContent = fcfa(frais("express")); };
 $("f").addEventListener("change", sum);
 const NOGEO = "Position automatique impossible (localisation bloquée par le navigateur ou la page). Collez un lien de position ci-dessous ou indiquez un repère.";
 const locTxt = l => l.gps ? l.gps.lat + ", " + l.gps.lng : (l.link || "non partagée");
@@ -293,17 +295,17 @@ function locate(k) {
   }, { enableHighAccuracy: true, timeout: 15000 });
 }
 function buildLoc(k, titre) {
-  const opts = QUARTIERS.map(n => `<option value="${n}">${n}</option>`).join("") + '<option value="__autre">Autre quartier</option>';
+  const opts = QUARTIERS.map(n => `<option value="${n}">${n}</option>`).join("");
   $("loc-" + k).innerHTML = `<h3>${titre}</h3>
-  <label class="fld" for="q-${k}">Quartier<select id="q-${k}"><option value="">Choisir un quartier</option>${opts}</select><p class="err" id="e-q-${k}"></p></label>
-  <label class="fld" for="autre-${k}" id="aw-${k}" hidden>Nom du quartier<input id="autre-${k}" type="text" placeholder="Ex. : Riviera 3"></label>
+  <label class="fld" for="q-${k}">Commune / zone<select id="q-${k}"><option value="">Choisir une zone</option>${opts}</select><p class="err" id="e-q-${k}"></p></label>
+
   <button class="btn alt" type="button" id="gps-${k}">Utiliser ma position actuelle</button>
   <p class="st" id="st-${k}" aria-live="polite">Position non partagée.</p>
   <label class="fld" for="link-${k}">Ou collez un lien de position <span class="hint">(Google Maps, WhatsApp) ou des coordonnées</span><input id="link-${k}" type="text" inputmode="url" placeholder="https://maps.app.goo.gl/…"></label>
   <a class="lnk" href="https://www.google.com/maps" target="_blank" rel="noopener">Ouvrir Google Maps pour copier un lien</a>
   ${k === "r" ? '<a class="lnk" id="ask-r" target="_blank" rel="noopener" hidden>Demander sa position au receveur sur WhatsApp</a>' : ""}
   <label class="fld" for="rep-${k}">Repère ou précision <span class="hint">(obligatoire sans position)</span><input id="rep-${k}" type="text" placeholder="Ex. : en face de la pharmacie, portail bleu"><p class="err" id="e-rep-${k}"></p></label>`;
-  $("q-" + k).addEventListener("change", () => { $("aw-" + k).hidden = $("q-" + k).value !== "__autre"; });
+
   $("gps-" + k).addEventListener("click", () => locate(k));
   $("link-" + k).addEventListener("input", () => {
     LOC[k].geo = null;
@@ -315,6 +317,7 @@ function buildLoc(k, titre) {
 }
 buildLoc("s", "Lieu de ramassage (envoyeur)");
 buildLoc("r", "Lieu de livraison (receveur)");
+sum();
 $("tel-r").addEventListener("input", () => {
   const R = phone($("tel-r").value), a = $("ask-r"); a.hidden = !R;
   if (R) a.href = "https://wa.me/225" + R + "?text=" + encodeURIComponent("Bonjour, c’est pour une livraison LeLivreur.Ci. Merci de m’envoyer votre position : dans WhatsApp, appuyez sur le trombone (ou le +), puis « Position ».");
@@ -355,7 +358,7 @@ function paint(c, H, o) {
   x.drawImage(L, P, y, lw, lh);
   x.textBaseline = "top"; x.textAlign = "right"; x.fillStyle = o.mode === "express" ? "#A10E0E" : "#0A7F3F";
   x.font = "800 44px " + FF; x.fillText(o.mode.toUpperCase(), 900 - P, y + 20);
-  x.fillStyle = "#1A2A1F"; x.font = "700 34px " + FF; x.fillText(fcfa(FRAIS[o.mode]), 900 - P, y + 76);
+  x.fillStyle = "#1A2A1F"; x.font = "700 34px " + FF; x.fillText(fcfa(o.fee), 900 - P, y + 76);
   x.fillStyle = "#5C6A5F"; x.font = "400 24px " + FF; x.fillText(o.date, 900 - P, y + 124); x.textAlign = "left";
   y += lh + 24;
   const row = (k, v) => {
@@ -405,14 +408,14 @@ $("f").addEventListener("submit", async e => {
   try {
     try { localStorage.setItem("ll-tel", S); } catch (_) {}
     await document.fonts.ready;
-    const m = mode(), ref = "LL-" + Date.now().toString(36).slice(-5).toUpperCase();
-    const o = { ref, mode: m, s: fmt(S), r: fmt(R), ls: L.s, lr: L.r, nature, photo,
+    const m = mode(), price = frais(m), ref = "LL-" + Date.now().toString(36).slice(-5).toUpperCase();
+    const o = { ref, mode: m, fee: price, s: fmt(S), r: fmt(R), ls: L.s, lr: L.r, nature, photo,
       date: new Date().toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }) };
     const c = document.createElement("canvas"); paint(c, paint(c, 3000, o) + 36, o);
     const blob = await new Promise(r => c.toBlob(r, "image/png"));
     const lt = l => l.q + " — " + (l.gps ? maps(l.gps) : l.link || "position non partagée") + (l.rep ? " — " + l.rep : "");
     const msg = ["Nouvelle commande " + ref, "Envoyeur : " + o.s, "Ramassage : " + lt(L.s), "Receveur : " + o.r,
-      "Livraison à : " + lt(L.r), "Colis : " + nature, "Mode : " + m + " (" + fcfa(FRAIS[m]) + ")"].join("\n");
+      "Livraison à : " + lt(L.r), "Colis : " + nature, "Mode : " + m + " (" + fcfa(o.fee) + ")"].join("\n");
     await saveOrderOnline(o, blob);
     order = { ref, blob, file: new File([blob], "commande-" + ref + ".png", { type: "image/png" }), msg };
     $("card").src = URL.createObjectURL(blob);
