@@ -153,7 +153,7 @@ input:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(21,
     <div class="header-actions"><span class="header-chip">Zone : Abidjan &amp; banlieue</span><a class="header-help" href="https://wa.me/2250779506009" target="_blank" rel="noopener">Assistance WhatsApp</a></div>
     </header>
   <section class="hero-intro" aria-labelledby="page-title">
-    <div class="hero-copy"><p class="hero-kicker">Livraison urbaine · Abidjan</p><h1 id="page-title">Demande d’expédition immédiate</h1><p>Zone couverte : Cocody, Bingerville, Abobo Dokui, Abobo Sogefia et Plateau.</p></div>
+    <div class="hero-copy"><p class="hero-kicker">Livraison urbaine · Abidjan</p><h1 id="page-title">Demande d’expédition immédiate</h1><p>Quartiers de Cocody, Bingerville et Plateau, plus Dokui et Sogefia &agrave; Abobo.</p></div>
     <div class="hero-facts"><span class="hero-fact">Colis : <strong>15 kg / 50 cm max.</strong></span><span class="hero-fact">À partir de <strong>1 000 FCFA</strong></span></div>
   </section>
 
@@ -213,9 +213,9 @@ input:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(21,
     </aside>
   </form>
   <section class="coverage" aria-labelledby="coverage-title">
-    <div class="coverage-head"><div><p class="coverage-kicker">Livraison locale abidjanaise</p><h2 id="coverage-title">Zones couvertes et tarifs</h2></div><span class="coverage-status">5 zones desservies</span></div>
+    <div class="coverage-head"><div><p class="coverage-kicker">Livraison locale abidjanaise</p><h2 id="coverage-title">Zones couvertes et tarifs</h2></div><span class="coverage-status">4 communes couvertes</span></div>
     <div class="zone-grid">
-      <article class="zone-card"><h3><span>1</span>Zones desservies</h3><p>Cocody, Bingerville, Abobo Dokui, Abobo Sogefia et Plateau.</p><p>Les deux quartiers d’Abobo sont dans la même commune.</p></article>
+      <article class="zone-card"><h3><span>1</span>Zones desservies</h3><p>Quartiers de Cocody, Bingerville et Plateau; Dokui et Sogefia &agrave; Abobo.</p><p>Abobo garde son tarif intra-commune.</p></article>
       <article class="zone-card"><h3><span>2</span>Dans une même commune</h3><p>Standard : <b>1 000 FCFA</b></p><p>Express : <b>2 000 FCFA</b></p></article>
       <article class="zone-card"><h3><span>3</span>Entre deux communes</h3><p>Standard : <b>1 500 FCFA</b></p><p>Express : <b>2 500 FCFA</b></p></article>
     </div>
@@ -250,7 +250,14 @@ const WHATSAPP = "2250779506009";   // numéro WhatsApp qui reçoit les commande
 const WAVE = "07 79 50 60 09";
 const LL_BACKEND = window.LELIVREUR_BACKEND || {};
 const TARIFS = { intra: { standard: 1000, express: 2000 }, inter: { standard: 1500, express: 2500 } };
-const QUARTIERS = ["Cocody","Bingerville","Abobo Dokui","Abobo Sogefia","Plateau"];
+const QUARTIERS_PAR_COMMUNE = {
+  "Cocody": ["Abatta Extension","Aghien","Agban","Agban Gendarmerie","Akouédo Ancien","Akouédo Nouveau","Akouédo Village","Allabra Sogefha","Ambassade","Angré","Anono","Attoban","Bockaus","Bonoumin","Canebière","Cité des Arts","Cité des Cadres","Cocody Centre","Cocody Village","Copraci Coprim","Danga","Djorogobité 1","Djorogobité 2","EECI Riviera","École de Gendarmerie","ENA","Golf 1","Golf 2","Lycée Technique","M’Badon","M’Pouto","Palmeraie Génie 2000","Riviera 3-4-5","Riviera Golf 1","Riviera Golf 2","Riviera Palmeraie","Sideci Riviera","Sideci Zoo","Sogefha Riviera 2","Soprim Vallon","7e Tranche","2 Plateaux","2 Plateaux Est","2 Plateaux IAE","2 Plateaux II","Universit\u00e9","Val-Doyen","Plateau Dokui"],
+  "Bingerville": ["Abatta Village","Adjamé-Bingerville","Ahoué","Akandjé","Akekoi","Akouai-Agban","Akouédo Attié","Akoyaté","Anan","Bingerville Centre","Blachon","Brégbo","Carrière","Eloka-Té","Eloka-To","Gbagba","Koffikro","M’Batto-Bouaké","Palma Afrique","Résidentiel","Santé","Sébía-Yao"],
+  "Abobo": ["Abobo Dokui","Abobo Sogefia"],
+  "Plateau": ["4 Villas","6 Bâtiments","40 Logements","Banco","Camp Gallieni","Camp Gendarmerie Indénié","Carena","Cité Esculape","Cité Policière","Gare Lagune","KM-NSIA","Marché du Plateau","Plateau Centre","Port-Douane","RAN Défense","Rue du Commerce"]
+};
+const QUARTIERS = Object.values(QUARTIERS_PAR_COMMUNE).flat();
+const COMMUNE_PAR_QUARTIER = Object.fromEntries(Object.entries(QUARTIERS_PAR_COMMUNE).flatMap(([c, qs]) => qs.map(q => [q, c])));
 const FF = '"Bricolage Grotesque","Segoe UI",system-ui,sans-serif';
 
 const $ = id => document.getElementById(id);
@@ -267,7 +274,7 @@ const restore = () => { try { const t = localStorage.getItem("ll-tel"); if (t) $
 restore();
 
 function toast(m) { const t = $("toast"); t.textContent = m; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("on"), 5000); }
-const commune = q => q.startsWith("Abobo ") ? "Abobo" : q;
+const commune = q => COMMUNE_PAR_QUARTIER[q] || "";
 const frais = (m = mode()) => { const s = commune($("q-s")?.value || ""), r = commune($("q-r")?.value || ""); return s && r && s !== r ? TARIFS.inter[m] : TARIFS.intra[m]; };
 const sum = () => { const m = mode(); $("sm-mode").textContent = m; $("sm-fee").textContent = fcfa(frais(m)); $("fee-standard").textContent = fcfa(frais("standard")); $("fee-express").textContent = fcfa(frais("express")); };
 $("f").addEventListener("change", sum);
@@ -295,9 +302,9 @@ function locate(k) {
   }, { enableHighAccuracy: true, timeout: 15000 });
 }
 function buildLoc(k, titre) {
-  const opts = QUARTIERS.map(n => `<option value="${n}">${n}</option>`).join("");
+  const opts = Object.entries(QUARTIERS_PAR_COMMUNE).map(([c, qs]) => `<optgroup label="${c}">${qs.map(n => `<option value="${n}">${n}</option>`).join("")}</optgroup>`).join("");
   $("loc-" + k).innerHTML = `<h3>${titre}</h3>
-  <label class="fld" for="q-${k}">Commune / zone<select id="q-${k}"><option value="">Choisir une zone</option>${opts}</select><p class="err" id="e-q-${k}"></p></label>
+  <label class="fld" for="q-${k}">Commune / quartier<select id="q-${k}"><option value="">Choisir un quartier</option>${opts}</select><p class="err" id="e-q-${k}"></p></label>
 
   <button class="btn alt" type="button" id="gps-${k}">Utiliser ma position actuelle</button>
   <p class="st" id="st-${k}" aria-live="polite">Position non partagée.</p>
