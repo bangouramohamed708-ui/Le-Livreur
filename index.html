@@ -142,6 +142,7 @@ input:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(21,
 
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:light;--bg:#fffdf5;--card:#fff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--brand:#087f3e;--on-brand:#fff;--accent:#b3261e;--soft:#e9f7ed;--warn:#fff7df;--wave:#168bd2;--wave-bg:#eef8ff;--err:#b3261e}}
 .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}.section-title{display:flex;align-items:center;gap:9px;margin:0 0 13px;padding:0 0 11px;border-bottom:1px solid var(--line);font-size:15px;font-weight:700;letter-spacing:-.02em}.section-title>span{display:grid;place-items:center;flex:none;width:23px;height:23px;border-radius:50%;background:#e2f5e8;color:#00652c;font-size:11px;font-weight:800}.section-title.compact{display:block;margin:0 0 9px;padding:0;border:0;font-size:11px;font-weight:600}
+#share-order{margin-bottom:10px}.share-fallback{display:grid;gap:10px;margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#f8fafc}.share-fallback .note{margin:0}#wa-txt{background:#25a95a;color:#fff}.share-fallback .btn.alt{margin:0}
 </style>
 </head>
 <body>
@@ -229,15 +230,17 @@ input:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(21,
       <button class="btn" type="button" id="copy">Copier le numéro</button>
     </div>
     <div class="rule"><b>Rappel</b>Nous ne livrons pas les colis de plus de 15 kg, ni ceux de plus de 50 cm de long, de large ou de haut.</div>
-    <p class="note">Dernière étape : envoyez l’image de votre commande à LeLivreur.Ci sur WhatsApp.</p>
-    <img id="card" alt="Image de la commande">
+    <p class="note"><b>Votre carte PNG contient le visuel et le récapitulatif de la commande.</b> Partagez l’image et les détails ensemble.</p>
+    <img id="card" alt="Image PNG de la commande">
     <div class="steps">
-      <p class="note"><b>Envoyez votre commande à LeLivreur.Ci en 2 étapes</b><br>Vous pouvez aussi maintenir le doigt sur l’image ci-dessus pour l’enregistrer.</p>
-      <button class="btn alt" type="button" id="save">1. Enregistrer l’image</button>
-      <a class="btn" id="wa-txt" target="_blank" rel="noopener">2. Envoyer sur WhatsApp</a>
-      <p class="note">WhatsApp s’ouvre sur la discussion avec LeLivreur.Ci, message déjà prêt. Appuyez sur le trombone (ou le +), joignez l’image enregistrée, puis envoyez.</p>
-    </div>
-    <button class="btn alt" type="button" id="again">Faire une autre demande</button>
+      <button class="btn" id="share-order" type="button" hidden>Partager le PNG et le texte</button>
+      <p class="note" id="share-hint" hidden>Dans le menu de partage, choisissez WhatsApp, puis la discussion LeLivreur.Ci et confirmez l’envoi.</p>
+      <div class="share-fallback" id="share-fallback">
+        <p class="note">Le partage groupé n’est pas disponible sur cet appareil. Enregistrez l’image, puis ouvrez WhatsApp avec le texte prérempli et joignez le PNG.</p>
+        <button class="btn alt" type="button" id="save">Enregistrer l’image PNG</button>
+        <a class="btn" id="wa-txt" target="_blank" rel="noopener">Ouvrir WhatsApp avec le texte</a>
+      </div>
+    </div>    <button class="btn alt" type="button" id="again">Faire une autre demande</button>
   </section>
   <footer class="site-footer"><div><strong>LeLivreur.Ci</strong><span>Le professionnel de la livraison urbaine à Abidjan.</span></div><a href="https://wa.me/2250779506009" target="_blank" rel="noopener">Assistance WhatsApp</a></footer>
 </main>
@@ -413,6 +416,8 @@ $("f").addEventListener("submit", async e => {
     $("card").src = URL.createObjectURL(blob);
     $("ref").textContent = "Commande n° " + ref;
     $("wa-txt").href = "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(msg);
+    let canSharePng = !!navigator.share; try { if (canSharePng && navigator.canShare) canSharePng = navigator.canShare({ files: [order.file] }); } catch (_) { canSharePng = false; }
+    $("share-order").hidden = !canSharePng; $("share-fallback").hidden = canSharePng; $("share-hint").hidden = !canSharePng;
     $("f").hidden = true; $("done").hidden = false;
     window.scrollTo(0, 0); $("done-h").focus({ preventScroll: true });
     toast("Commande reçue. Payez 500 FCFA sur Wave pour la valider.");
@@ -422,6 +427,17 @@ $("f").addEventListener("submit", async e => {
 
 
 
+$("share-order").addEventListener("click", async () => {
+  if (!order || !navigator.share) return;
+  try {
+    await navigator.share({ title: "Commande LeLivreur.Ci " + order.ref, text: order.msg, files: [order.file] });
+    toast("Partage lancé. Choisissez WhatsApp, puis la discussion LeLivreur.Ci.");
+  } catch (err) {
+    if (err.name === "AbortError") return;
+    $("share-order").hidden = true; $("share-hint").hidden = true; $("share-fallback").hidden = false;
+    toast("Le partage groupé a échoué. Enregistrez le PNG puis ouvrez WhatsApp avec le texte.");
+  }
+});
 $("save").addEventListener("click", () => {
   if (!order) return;
   const url = URL.createObjectURL(order.blob), a = document.createElement("a");
